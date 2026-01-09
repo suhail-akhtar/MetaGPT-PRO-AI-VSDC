@@ -114,6 +114,18 @@ async def main():
 asyncio.run(main())  # or await main() in a jupyter notebook setting
 ```
 
+### Enterprise API (REST/WebSocket)
+
+MetaGPT-Pro now includes a robust Enterprise API (`http://localhost:8000/v1`) for managing teams, executing projects, and real-time observability.
+
+**Start the Server:**
+```bash
+metagpt-server
+```
+
+**Documentation:**
+- [Enterprise API Reference](docs/api/enterprise_api.md)
+
 
 ### QuickStart & Demo Video
 - Try it on [MetaGPT Huggingface Space](https://huggingface.co/spaces/deepwisdom/MetaGPT-SoftwareCompany)

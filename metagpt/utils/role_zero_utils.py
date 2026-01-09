@@ -133,6 +133,15 @@ async def parse_commands(command_rsp: str, llm, exclusive_tool_commands: list[st
     if isinstance(commands, dict):
         commands = commands["commands"] if "commands" in commands else [commands]
 
+    # Filter out invalid commands
+    valid_commands = []
+    for command in commands:
+        if isinstance(command, dict) and "command_name" in command:
+            valid_commands.append(command)
+        else:
+            logger.warning(f"Skipping invalid command format: {command}")
+    commands = valid_commands
+
     # Set the exclusive command flag to False.
     command_flag = [command["command_name"] not in exclusive_tool_commands for command in commands]
     if command_flag.count(False) > 1:

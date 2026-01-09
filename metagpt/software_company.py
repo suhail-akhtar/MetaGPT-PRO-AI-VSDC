@@ -45,9 +45,9 @@ def generate_repo(
         company.hire(
             [
                 TeamLeader(),
-                ProductManager(),
-                Architect(),
-                Engineer2(),
+                ProductManager(use_fixed_sop=False),
+                Architect(use_fixed_sop=False),
+                Engineer2(use_fixed_sop=False),
                 # ProjectManager(),
                 DataAnalyst(),
             ]
@@ -66,7 +66,8 @@ def generate_repo(
             raise FileNotFoundError(f"{recover_path} not exists or not endswith `team`")
 
         company = Team.deserialize(stg_path=stg_path, context=ctx)
-        idea = company.idea
+        if not idea:
+            idea = company.idea
 
     company.invest(investment)
     asyncio.run(company.run(n_round=n_round, idea=idea))

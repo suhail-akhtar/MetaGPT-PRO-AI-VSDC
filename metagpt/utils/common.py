@@ -43,7 +43,8 @@ import loguru
 import requests
 from PIL import Image
 from pydantic_core import to_jsonable_python
-from tenacity import RetryCallState, RetryError, _utils
+from tenacity import RetryCallState, RetryError, _utils, retry, stop_after_attempt, wait_random_exponential, retry_if_exception_type 
+import openai
 
 from metagpt.const import MARKDOWN_TITLE_PREFIX, MESSAGE_ROUTE_TO_ALL
 from metagpt.logs import logger

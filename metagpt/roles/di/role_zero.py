@@ -328,11 +328,8 @@ class RoleZero(Role):
             if self.rc.max_react_loop >= 10 and actions_taken >= self.rc.max_react_loop:
                 # If max_react_loop is a small value (e.g. < 10), it is intended to be reached and make the agent stop
                 logger.warning(f"reached max_react_loop: {actions_taken}")
-                human_rsp = await self.ask_human(
-                    "I have reached my max action rounds, do you want me to continue? Yes or no"
-                )
-                if "yes" in human_rsp.lower():
-                    actions_taken = 0
+                logger.warning("Reached max_react_loop. Stopping gracefully to avoid infinite loop or crash.")
+                break
         return rsp  # return output from the last action
 
     def format_quick_system_prompt(self) -> str:

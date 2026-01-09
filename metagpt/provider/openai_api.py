@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import openai
 from typing import Optional, Union
 
 from openai import APIConnectionError, AsyncOpenAI, AsyncStream
@@ -163,10 +164,10 @@ class OpenAILLM(BaseLLM):
         return await self._achat_completion(messages, timeout=self.get_timeout(timeout))
 
     @retry(
-        wait=wait_random_exponential(min=1, max=60),
-        stop=stop_after_attempt(6),
+        wait=wait_random_exponential(min=5, max=120),
+        stop=stop_after_attempt(10),
         after=after_log(logger, logger.level("WARNING").name),
-        retry=retry_if_exception_type(APIConnectionError),
+        retry=retry_if_exception_type((APIConnectionError, openai.RateLimitError)),
         retry_error_callback=log_and_reraise,
     )
     async def acompletion_text(self, messages: list[dict], stream=False, timeout=USE_CONFIG_TIMEOUT) -> str:

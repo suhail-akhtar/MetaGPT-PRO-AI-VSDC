@@ -95,6 +95,12 @@ extras_require["android_assistant"] = [
     "clip-openai",
 ]
 
+extras_require["api"] = [
+    "fastapi",
+    "uvicorn",
+    "websockets",
+]
+
 setup(
     name="metagpt",
     version="1.0.0",
@@ -116,6 +122,7 @@ setup(
     entry_points={
         "console_scripts": [
             "metagpt=metagpt.software_company:app",
+            "metagpt-server=metagpt.api.server:main",
         ],
     },
     include_package_data=True,
