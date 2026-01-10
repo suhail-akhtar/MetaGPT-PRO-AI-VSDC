@@ -1,0 +1,55 @@
+.card {
+    background: rgb(var(--bg-secondary));
+    border: 1px solid rgb(var(--border-color));
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+    overflow: hidden;
+}
+
+.interactive {
+    cursor: pointer;
+}
+
+.interactive:hover {
+    border-color: rgb(var(--color-primary) / 0.5);
+    box-shadow: 0 0 20px rgb(var(--color-primary) / 0.15);
+    transform: translateY(-2px);
+}
+
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+}
+
+.glow {
+    box-shadow: 0 0 30px rgb(var(--color-primary) / 0.2);
+}
+
+.noPadding {
+    padding: 0;
+}
+
+.header {
+    padding: var(--space-4);
+    border-bottom: 1px solid rgb(var(--border-color));
+}
+
+.gradientHeader {
+    background: linear-gradient(135deg, rgb(var(--color-primary) / 0.1), rgb(var(--color-accent) / 0.1));
+}
+
+.body {
+    padding: var(--space-4);
+}
+
+.bodyLarge {
+    padding: var(--space-6);
+}
+
+.footer {
+    padding: var(--space-4);
+    border-top: 1px solid rgb(var(--border-color));
+    background: rgb(var(--bg-tertiary) / 0.5);
+}

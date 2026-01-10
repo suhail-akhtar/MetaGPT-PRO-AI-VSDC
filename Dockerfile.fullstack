@@ -1,0 +1,84 @@
+# MetaGPT-PRO Full Stack Dockerfile
+# Combines backend (Python) and frontend (Next.js) in a single container
+# Use this for simple deployment, or docker-compose for production
+
+FROM nikolaik/python-nodejs:python3.9-nodejs20
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y libgomp1 git chromium fonts-ipafont-gothic fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 supervisor --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Mermaid CLI configuration
+ENV CHROME_BIN="/usr/bin/chromium" \
+    puppeteer_config="/app/metagpt/config/puppeteer-config.json" \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
+
+RUN npm install -g @mermaid-js/mermaid-cli && \
+    npm cache clean --force
+
+# ========= Backend Setup =========
+WORKDIR /app/metagpt
+
+# Copy backend code
+COPY metagpt ./metagpt
+COPY config ./config
+COPY requirements.txt setup.py ./
+
+# Create workspace and install Python dependencies
+RUN mkdir -p workspace && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir fastapi uvicorn && \
+    pip install -e .
+
+# ========= Frontend Setup =========
+WORKDIR /app/frontend
+
+# Copy frontend package files
+COPY frontend/package.json frontend/package-lock.json* ./
+
+# Install frontend dependencies
+RUN npm ci
+
+# Copy frontend source
+COPY frontend/ ./
+
+# Build frontend with API URL pointing to localhost (same container)
+ENV NEXT_PUBLIC_API_URL=http://localhost:8080/v1 \
+    NEXT_PUBLIC_WS_URL=ws://localhost:8080/v1 \
+    NEXT_PUBLIC_ENABLE_MOCK=false \
+    NEXT_TELEMETRY_DISABLED=1
+
+RUN npm run build
+
+# ========= Supervisor Configuration =========
+WORKDIR /app
+
+# Create supervisor config to run both services
+RUN echo '[supervisord]' > /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'nodaemon=true' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo '' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo '[program:backend]' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'command=python -m uvicorn metagpt.api.main:app --host 0.0.0.0 --port 8080' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'directory=/app/metagpt' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'autostart=true' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'autorestart=true' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'stderr_logfile=/var/log/backend.err.log' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'stdout_logfile=/var/log/backend.out.log' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo '' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo '[program:frontend]' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'command=npm start' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'directory=/app/frontend' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'autostart=true' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'autorestart=true' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'stderr_logfile=/var/log/frontend.err.log' >> /etc/supervisor/conf.d/metagpt.conf && \
+    echo 'stdout_logfile=/var/log/frontend.out.log' >> /etc/supervisor/conf.d/metagpt.conf
+
+# Expose ports
+# 3000 = Frontend
+# 8080 = Backend API
+EXPOSE 3000 8080
+
+# Run both services with supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

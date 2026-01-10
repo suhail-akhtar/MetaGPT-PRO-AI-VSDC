@@ -1,0 +1,396 @@
+.page {
+    padding: var(--space-6) 0;
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+}
+
+.headerLeft h1 {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--text-primary));
+}
+
+.headerLeft p {
+    font-size: var(--text-sm);
+    color: rgb(var(--text-muted));
+    margin-top: var(--space-1);
+}
+
+.headerActions {
+    display: flex;
+    gap: var(--space-3);
+}
+
+/* Alert Banner */
+.alertBanner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4);
+    background: rgb(var(--color-danger) / 0.1);
+    border-left: 4px solid rgb(var(--color-danger));
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-6);
+}
+
+.alertContent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.alertIcon {
+    color: rgb(var(--color-danger));
+}
+
+.alertTitle {
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--color-danger-light));
+}
+
+.alertDescription {
+    font-size: var(--text-sm);
+    color: rgb(var(--color-danger-light));
+    opacity: 0.8;
+}
+
+.alertAction {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--color-danger-light));
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.alertAction:hover {
+    text-decoration: underline;
+}
+
+/* Stats Grid */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+@media (min-width: 768px) {
+    .statsGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.statCard {
+    padding: var(--space-5);
+}
+
+.statHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+}
+
+.statLabel {
+    font-size: var(--text-sm);
+    color: rgb(var(--text-muted));
+}
+
+.statValue {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--text-primary));
+}
+
+.statIcon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+}
+
+.statIconPrimary {
+    background: rgb(var(--color-primary) / 0.2);
+    color: rgb(var(--color-primary-light));
+}
+
+.statIconSuccess {
+    background: rgb(var(--color-success) / 0.2);
+    color: rgb(var(--color-success-light));
+}
+
+.statIconDanger {
+    background: rgb(var(--color-danger) / 0.2);
+    color: rgb(var(--color-danger-light));
+}
+
+.statIconAccent {
+    background: rgb(var(--color-accent) / 0.2);
+    color: rgb(168 85 247);
+}
+
+.statFooter {
+    font-size: var(--text-sm);
+    margin-top: var(--space-2);
+}
+
+.statPositive {
+    color: rgb(var(--color-success));
+}
+
+.statNegative {
+    color: rgb(var(--color-danger));
+}
+
+.statNeutral {
+    color: rgb(var(--text-muted));
+}
+
+/* Main Content */
+.mainContent {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+}
+
+@media (min-width: 1024px) {
+    .mainContent {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+/* Agents Panel */
+.agentsPanel {
+    height: fit-content;
+}
+
+.sectionTitle {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--text-primary));
+    padding: var(--space-4);
+    border-bottom: 1px solid rgb(var(--border-color));
+}
+
+.agentsList {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.agentCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgb(var(--border-color));
+}
+
+.agentCardPink {
+    background: rgb(236 72 153 / 0.1);
+    border-color: rgb(236 72 153 / 0.2);
+}
+
+.agentCardBlue {
+    background: rgb(59 130 246 / 0.1);
+    border-color: rgb(59 130 246 / 0.2);
+}
+
+.agentCardGreen {
+    background: rgb(var(--color-success) / 0.1);
+    border-color: rgb(var(--color-success) / 0.2);
+}
+
+.agentInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.agentName {
+    font-weight: var(--weight-medium);
+    color: rgb(var(--text-primary));
+}
+
+.agentStatus {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: rgb(var(--text-secondary));
+}
+
+.statusDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.statusDotOnline {
+    background: rgb(var(--color-success));
+}
+
+.statusDotBusy {
+    background: rgb(var(--color-warning));
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.agentAction {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.agentActionPink {
+    color: rgb(236 72 153);
+}
+
+.agentActionBlue {
+    color: rgb(59 130 246);
+}
+
+.agentActionGreen {
+    color: rgb(var(--color-success));
+}
+
+/* Activity Panel */
+.activityPanel {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activityList {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.activityItem {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.activityIcon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+.activityIconSuccess {
+    background: rgb(var(--color-success) / 0.2);
+    color: rgb(var(--color-success-light));
+}
+
+.activityIconDanger {
+    background: rgb(var(--color-danger) / 0.2);
+    color: rgb(var(--color-danger-light));
+}
+
+.activityIconInfo {
+    background: rgb(var(--color-info) / 0.2);
+    color: rgb(96 165 250);
+}
+
+.activityIconAccent {
+    background: rgb(var(--color-accent) / 0.2);
+    color: rgb(192 132 252);
+}
+
+.activityIconWarning {
+    background: rgb(var(--color-warning) / 0.2);
+    color: rgb(var(--color-warning-light));
+}
+
+.activityContent {
+    flex: 1;
+}
+
+.activityText {
+    font-size: var(--text-sm);
+    color: rgb(var(--text-primary));
+}
+
+.activityTime {
+    font-size: var(--text-xs);
+    color: rgb(var(--text-muted));
+}
+
+/* Quick Actions */
+.quickActions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+}
+
+@media (min-width: 768px) {
+    .quickActions {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.actionCard {
+    padding: var(--space-4);
+    text-align: left;
+    cursor: pointer;
+}
+
+.actionIcon {
+    margin-bottom: var(--space-2);
+}
+
+.actionIconYellow {
+    color: rgb(var(--color-warning));
+}
+
+.actionIconBlue {
+    color: rgb(var(--color-info));
+}
+
+.actionIconRed {
+    color: rgb(var(--color-danger));
+}
+
+.actionIconPurple {
+    color: rgb(var(--color-accent));
+}
+
+.actionTitle {
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--text-primary));
+    margin-bottom: var(--space-1);
+}
+
+.actionDescription {
+    font-size: var(--text-sm);
+    color: rgb(var(--text-secondary));
+}

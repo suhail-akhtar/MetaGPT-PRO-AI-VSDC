@@ -1,0 +1,95 @@
+.spinner {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.ring {
+    border-radius: 50%;
+    border: 2px solid rgb(var(--bg-tertiary));
+    border-top-color: rgb(var(--color-primary));
+    animation: spin 0.8s linear infinite;
+}
+
+.sm .ring {
+    width: 16px;
+    height: 16px;
+}
+
+.md .ring {
+    width: 24px;
+    height: 24px;
+}
+
+.lg .ring {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+}
+
+.xl .ring {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+}
+
+.label {
+    font-size: var(--text-sm);
+    color: rgb(var(--text-secondary));
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Skeleton */
+.skeletonContainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.skeleton {
+    background: linear-gradient(90deg,
+            rgb(var(--bg-tertiary)) 25%,
+            rgb(var(--bg-elevated)) 50%,
+            rgb(var(--bg-tertiary)) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.text {
+    height: 16px;
+    border-radius: var(--radius-md);
+}
+
+.circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.rect {
+    width: 100%;
+    height: 100px;
+    border-radius: var(--radius-lg);
+}
+
+.card {
+    width: 100%;
+    height: 160px;
+    border-radius: var(--radius-xl);
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}

@@ -1,0 +1,124 @@
+.page {
+    padding: var(--space-6) 0;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+}
+
+.title {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--text-primary));
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.projectCard {
+    cursor: pointer;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+}
+
+.cardTitle {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--text-primary));
+    margin-bottom: var(--space-2);
+}
+
+.cardDescription {
+    font-size: var(--text-sm);
+    color: rgb(var(--text-secondary));
+    margin-bottom: var(--space-4);
+    line-height: var(--leading-relaxed);
+}
+
+.cardMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.agents {
+    display: flex;
+}
+
+.agents>*+* {
+    margin-left: -8px;
+}
+
+.progress {
+    font-size: var(--text-sm);
+    color: rgb(var(--text-secondary));
+}
+
+.progressBar {
+    margin-top: var(--space-4);
+}
+
+.cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: rgb(var(--text-muted));
+    margin-top: var(--space-4);
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.bugIcon {
+    color: rgb(var(--color-danger));
+}
+
+.emptyState {
+    text-align: center;
+    padding: var(--space-16) var(--space-4);
+    color: rgb(var(--text-secondary));
+}
+
+.emptyIcon {
+    color: rgb(var(--text-muted));
+    margin-bottom: var(--space-4);
+}
+
+.emptyTitle {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--text-primary));
+    margin-bottom: var(--space-2);
+}
+
+.emptyDescription {
+    margin-bottom: var(--space-6);
+}

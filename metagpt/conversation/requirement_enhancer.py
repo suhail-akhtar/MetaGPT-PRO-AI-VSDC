@@ -109,37 +109,29 @@ class RequirementEnhancer:
             idea=idea
         )
         
-        try:
-            response = await llm.aask(prompt)
-            # Parse JSON from response
-            import json
-            import re
-            
-            # Extract JSON from markdown code block if present
-            json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', response)
-            if json_match:
-                json_str = json_match.group(1)
-            else:
-                json_str = response
-            
-            data = json.loads(json_str)
-            return EnhancedRequirements(
-                project_name=data.get("project_name", ""),
-                original_idea=idea,
-                core_features=data.get("core_features", []),
-                user_stories=data.get("user_stories", []),
-                technical_assumptions=data.get("technical_assumptions", []),
-                constraints=data.get("constraints", []),
-                platform=data.get("platform", ""),
-                programming_language=data.get("programming_language", "")
-            )
-        except Exception as e:
-            logger.exception(f"Failed to enhance requirements: {e}")
-            # Return basic structure on failure
-            return EnhancedRequirements(
-                original_idea=idea,
-                core_features=["Feature based on: " + idea],
-            )
+        response = await llm.aask(prompt)
+        # Parse JSON from response
+        import json
+        import re
+        
+        # Extract JSON from markdown code block if present
+        json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', response)
+        if json_match:
+            json_str = json_match.group(1)
+        else:
+            json_str = response
+        
+        data = json.loads(json_str)
+        return EnhancedRequirements(
+            project_name=data.get("project_name", ""),
+            original_idea=idea,
+            core_features=data.get("core_features", []),
+            user_stories=data.get("user_stories", []),
+            technical_assumptions=data.get("technical_assumptions", []),
+            constraints=data.get("constraints", []),
+            platform=data.get("platform", ""),
+            programming_language=data.get("programming_language", "")
+        )
     
     async def generate_clarifying_questions(
         self,
@@ -165,23 +157,16 @@ class RequirementEnhancer:
             already_discussed=discussed_str
         )
         
-        try:
-            response = await llm.aask(prompt)
-            import json
-            import re
-            
-            # Extract JSON from markdown code block if present
-            json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', response)
-            if json_match:
-                json_str = json_match.group(1)
-            else:
-                json_str = response
-            
-            questions = json.loads(json_str)
-            return questions if isinstance(questions, list) else []
-        except Exception as e:
-            logger.exception(f"Failed to generate questions: {e}")
-            return [
-                "What platform should this run on (Web, CLI, Mobile)?",
-                "Are there any specific features you'd like to prioritize?"
-            ]
+        response = await llm.aask(prompt)
+        import json
+        import re
+        
+        # Extract JSON from markdown code block if present
+        json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', response)
+        if json_match:
+            json_str = json_match.group(1)
+        else:
+            json_str = response
+        
+        questions = json.loads(json_str)
+        return questions if isinstance(questions, list) else []

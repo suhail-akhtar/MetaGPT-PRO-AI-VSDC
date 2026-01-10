@@ -1,10 +1,19 @@
 from fastapi import FastAPI
-from metagpt.api.routes import company, config, roles, files, stream, conversation, project, agents, bugs, versions
+from fastapi.middleware.cors import CORSMiddleware
+from metagpt.api.routes import company, config, roles, files, stream, conversation, project, projects, agents, bugs, versions
 
 app = FastAPI(
     title="MetaGPT-Pro Enterprise API",
     description="Autonomous Software Development Virtual Company API",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for dev simplicity
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include Routers
@@ -15,6 +24,7 @@ app.include_router(files.router, prefix="/v1/files", tags=["Files"])
 app.include_router(stream.router, prefix="/v1/stream", tags=["Streaming"])
 app.include_router(conversation.router, prefix="/v1/conversation", tags=["Conversation"])
 app.include_router(project.router, prefix="/v1/project", tags=["Project"])
+app.include_router(projects.router, prefix="/v1/projects", tags=["Projects"])
 app.include_router(agents.router, prefix="/v1/agents", tags=["Agent Collaboration"])
 app.include_router(bugs.router, prefix="/v1/project", tags=["Bug Tracking"])
 app.include_router(versions.router, prefix="/v1/project", tags=["Versioning"])

@@ -104,17 +104,7 @@ class ConversationManager:
         llm = self._get_llm()
         prompt = FIRST_QUESTION_PROMPT.format(idea=initial_idea)
         
-        try:
-            first_question = await llm.aask(prompt)
-        except Exception as e:
-            logger.exception(f"Failed to generate first question: {e}")
-            first_question = (
-                f"Thanks for sharing your idea about '{initial_idea}'. "
-                "I have a few questions to help me understand better:\n\n"
-                "1. What platform should this run on (Web, Mobile, CLI)?\n"
-                "2. Who are the primary users of this application?\n"
-                "3. Are there any specific features you'd like to prioritize?"
-            )
+        first_question = await llm.aask(prompt)
         
         # Add AI response
         ai_msg = ConversationMessage(role="assistant", content=first_question)
@@ -145,7 +135,9 @@ class ConversationManager:
             raise ValueError(f"Conversation {conversation_id} not found")
         
         if session.status == ConversationStatus.APPROVED:
-            raise ValueError(f"Conversation {conversation_id} is already approved")
+            # Allow continuing conversation but mark context as "post-approval"
+            logger.info(f"Adding message to approved session {conversation_id}")
+            # raise ValueError(f"Conversation {conversation_id} is already approved")
         
         # Add user message
         user_msg = ConversationMessage(role="user", content=user_message)
@@ -164,11 +156,7 @@ class ConversationManager:
             message=user_message
         )
         
-        try:
-            ai_response = await llm.aask(prompt)
-        except Exception as e:
-            logger.exception(f"Failed to generate AI response: {e}")
-            ai_response = "I understand. Let me process that. Is there anything else you'd like to add?"
+        ai_response = await llm.aask(prompt)
         
         # Add AI response
         ai_msg = ConversationMessage(role="assistant", content=ai_response)

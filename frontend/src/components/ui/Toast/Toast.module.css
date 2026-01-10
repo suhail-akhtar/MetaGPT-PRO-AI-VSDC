@@ -1,0 +1,146 @@
+.toastContainer {
+    position: fixed;
+    z-index: var(--z-toast);
+    pointer-events: none;
+    padding: var(--space-4);
+}
+
+.topRight {
+    top: 0;
+    right: 0;
+}
+
+.topLeft {
+    top: 0;
+    left: 0;
+}
+
+.topCenter {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bottomRight {
+    bottom: 0;
+    right: 0;
+}
+
+.bottomLeft {
+    bottom: 0;
+    left: 0;
+}
+
+.bottomCenter {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.toastList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: rgb(var(--bg-secondary));
+    border: 1px solid rgb(var(--border-color));
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    min-width: 320px;
+    max-width: 420px;
+}
+
+.toastIcon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.success .toastIcon {
+    color: rgb(var(--color-success));
+}
+
+.error .toastIcon {
+    color: rgb(var(--color-danger));
+}
+
+.warning .toastIcon {
+    color: rgb(var(--color-warning));
+}
+
+.info .toastIcon {
+    color: rgb(var(--color-info));
+}
+
+.toastContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.toastTitle {
+    font-weight: var(--weight-medium);
+    color: rgb(var(--text-primary));
+    margin-bottom: var(--space-1);
+}
+
+.toastMessage {
+    font-size: var(--text-sm);
+    color: rgb(var(--text-secondary));
+    line-height: var(--leading-relaxed);
+}
+
+.toastAction {
+    margin-top: var(--space-2);
+}
+
+.toastActionBtn {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--color-primary));
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.toastActionBtn:hover {
+    text-decoration: underline;
+}
+
+.closeBtn {
+    flex-shrink: 0;
+    padding: var(--space-1);
+    color: rgb(var(--text-muted));
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.closeBtn:hover {
+    background: rgb(var(--bg-tertiary));
+    color: rgb(var(--text-primary));
+}
+
+/* Progress bar for auto-dismiss */
+.progressBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgb(var(--bg-tertiary));
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: rgb(var(--color-primary));
+    transform-origin: left;
+}

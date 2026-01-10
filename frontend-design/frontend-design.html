@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaGPT-Pro - Autonomous AI Software Engineering Company</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .chat-message {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-card {
+            transition: all 0.2s;
+            cursor: move;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .severity-critical {
+            border-left: 4px solid #DC2626;
+        }
+
+        .severity-high {
+            border-left: 4px solid #EA580C;
+        }
+
+        .severity-medium {
+            border-left: 4px solid #F59E0B;
+        }
+
+        .severity-low {
+            border-left: 4px solid #10B981;
+        }
+
+        .diff-added {
+            background: #D1FAE5;
+        }
+
+        .diff-removed {
+            background: #FEE2E2;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-brain text-indigo-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900">MetaGPT-Pro</span>
+                    </div>
+                    <div class="hidden sm:ml-8 sm:flex sm:space-x-8">
+                        <a onclick="showView('projects')"
+                            class="nav-link border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer">
+                            <i class="fas fa-folder mr-2"></i> Projects
+                        </a>
+                        <a onclick="showView('new-project')"
+                            class="nav-link border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer">
+                            <i class="fas fa-plus-circle mr-2"></i> New Project
+                        </a>
+                        <a onclick="showView('files')"
+                            class="nav-link border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer">
+                            <i class="fas fa-folder-open mr-2"></i> Files
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button class="p-2 rounded-full text-gray-400 hover:text-gray-500 relative">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
+                    </button>
+                    <div class="ml-3 relative">
+                        <button class="flex items-center text-sm rounded-full focus:outline-none">
+                            <img class="h-8 w-8 rounded-full"
+                                src="https://ui-avatars.com/api/?name=Admin&background=4F46E5&color=fff" alt="">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Projects List View -->
+    <div id="view-projects" class="view">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-900">Your Projects</h1>
+                    <button onclick="showView('new-project')"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> New Project
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Active Project Card -->
+                    <div onclick="showView('dashboard')"
+                        class="bg-white rounded-lg shadow hover:shadow-lg transition cursor-pointer border border-gray-200">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
+                                <span class="text-sm text-gray-500">Sprint 2/4</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">E-commerce Platform</h3>
+                            <p class="text-sm text-gray-600 mb-4">Full-stack marketplace with payment integration</p>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full" title="Alice (PM)">
+                                    <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full" title="Bob (Architect)">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full" title="Alex (Engineer)">
+                                </div>
+                                <span class="text-gray-500">68% Complete</span>
+                            </div>
+                            <div class="mt-4 bg-gray-200 rounded-full h-2">
+                                <div class="bg-indigo-600 h-2 rounded-full" style="width: 68%"></div>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-tasks mr-1"></i> 12/18 tasks</span>
+                                <span><i class="fas fa-bug mr-1 text-red-500"></i> 2 bugs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Project -->
+                    <div
+                        class="bg-white rounded-lg shadow hover:shadow-lg transition cursor-pointer border border-gray-200">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Completed</span>
+                                <span class="text-sm text-gray-500">4 sprints</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">CRM Dashboard</h3>
+                            <p class="text-sm text-gray-600 mb-4">Customer relationship management system</p>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                </div>
+                                <span class="text-green-600 font-medium"><i class="fas fa-check-circle mr-1"></i>
+                                    Done</span>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-calendar mr-1"></i> Completed Dec 2024</span>
+                                <span><i class="fas fa-code mr-1"></i> 24 files</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Planning Project -->
+                    <div
+                        class="bg-white rounded-lg shadow hover:shadow-lg transition cursor-pointer border border-gray-200">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <span
+                                    class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Planning</span>
+                                <span class="text-sm text-gray-500">Sprint 0</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Mobile App Backend</h3>
+                            <p class="text-sm text-gray-600 mb-4">REST API with authentication and real-time features
+                            </p>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <div class="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <i class="fas fa-plus text-gray-400 text-xs"></i>
+                                    </div>
+                                </div>
+                                <span class="text-gray-500">Requirements review</span>
+                            </div>
+                            <div class="mt-4 bg-gray-200 rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 15%"></div>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-clock mr-1"></i> Started 2 days ago</span>
+                                <span><i class="fas fa-comments mr-1"></i> 8 conversations</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Project / Conversation View -->
+    <div id="view-new-project" class="view active">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 sm:px-0">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">Start New Project</h1>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Conversation Panel -->
+                    <div class="bg-white rounded-lg shadow-lg border border-gray-200">
+                        <div class="border-b border-gray-200 p-4 bg-gradient-to-r from-indigo-50 to-purple-50">
+                            <div class="flex items-center">
+                                <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff"
+                                    class="h-10 w-10 rounded-full mr-3">
+                                <div>
+                                    <h3 class="font-semibold text-gray-900">Alice - Product Manager</h3>
+                                    <p class="text-xs text-gray-500 flex items-center">
+                                        <span class="w-2 h-2 bg-green-400 rounded-full mr-1 pulse-dot"></span>
+                                        Online - Ready to help
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="h-96 overflow-y-auto p-4 space-y-4" id="chat-messages">
+                            <!-- AI Message -->
+                            <div class="flex items-start space-x-3 chat-message">
+                                <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=32"
+                                    class="h-8 w-8 rounded-full">
+                                <div class="bg-gray-100 rounded-lg p-3 max-w-md">
+                                    <p class="text-sm text-gray-900">Hi! I'm Alice, your AI Product Manager. I'll help
+                                        transform your idea into a detailed project plan. What would you like to build?
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- User Message -->
+                            <div class="flex items-start space-x-3 justify-end chat-message">
+                                <div class="bg-indigo-600 rounded-lg p-3 max-w-md">
+                                    <p class="text-sm text-white">I need an e-commerce platform for selling handmade
+                                        crafts</p>
+                                </div>
+                                <img src="https://ui-avatars.com/api/?name=You&background=6B7280&color=fff&size=32"
+                                    class="h-8 w-8 rounded-full">
+                            </div>
+
+                            <!-- AI Follow-up -->
+                            <div class="flex items-start space-x-3 chat-message">
+                                <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=32"
+                                    class="h-8 w-8 rounded-full">
+                                <div class="bg-gray-100 rounded-lg p-3 max-w-md">
+                                    <p class="text-sm text-gray-900 mb-2">Great! Let me ask a few questions to
+                                        understand your needs:</p>
+                                    <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                                        <li>Who are your target users?</li>
+                                        <li>Do you need payment integration? (Stripe, PayPal?)</li>
+                                        <li>Should sellers manage their own inventory?</li>
+                                        <li>Any specific features? (Reviews, wishlist, etc.)</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- User Response -->
+                            <div class="flex items-start space-x-3 justify-end chat-message">
+                                <div class="bg-indigo-600 rounded-lg p-3 max-w-md">
+                                    <p class="text-sm text-white">Target is craft buyers aged 25-45. Need Stripe
+                                        payments. Sellers should manage inventory. Must have reviews and wishlists.</p>
+                                </div>
+                                <img src="https://ui-avatars.com/api/?name=You&background=6B7280&color=fff&size=32"
+                                    class="h-8 w-8 rounded-full">
+                            </div>
+
+                            <!-- AI Generating -->
+                            <div class="flex items-start space-x-3 chat-message">
+                                <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=32"
+                                    class="h-8 w-8 rounded-full">
+                                <div class="bg-gray-100 rounded-lg p-3 max-w-md">
+                                    <p class="text-sm text-gray-900">Perfect! I'm generating your Product Requirements
+                                        Document...</p>
+                                    <div class="mt-2 flex items-center text-indigo-600">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                                        <span class="text-xs">Analyzing requirements...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-200 p-4">
+                            <div class="flex space-x-2">
+                                <input type="text" placeholder="Type your response..."
+                                    class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PRD Preview Panel -->
+                    <div class="bg-white rounded-lg shadow-lg border border-gray-200">
+                        <div class="border-b border-gray-200 p-4 bg-gradient-to-r from-green-50 to-emerald-50">
+                            <h3 class="font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-file-alt text-green-600 mr-2"></i>
+                                Generated Requirements (Draft v1)
+                            </h3>
+                        </div>
+
+                        <div class="p-6 h-96 overflow-y-auto">
+                            <div class="prose prose-sm max-w-none">
+                                <h4 class="text-lg font-bold text-gray-900 mb-3">Project: Handcraft Marketplace</h4>
+
+                                <div class="bg-blue-50 border-l-4 border-blue-500 p-3 mb-4">
+                                    <p class="text-sm text-blue-900"><strong>Vision:</strong> A platform connecting
+                                        craft sellers with buyers, featuring secure payments and inventory management.
+                                    </p>
+                                </div>
+
+                                <h5 class="font-semibold text-gray-900 mt-4 mb-2">User Stories</h5>
+                                <ul class="space-y-2 text-sm text-gray-700">
+                                    <li class="flex items-start">
+                                        <span
+                                            class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-xs mr-2 mt-0.5">US-1</span>
+                                        <span>As a buyer, I want to browse crafts by category so I can find products I'm
+                                            interested in</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span
+                                            class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-xs mr-2 mt-0.5">US-2</span>
+                                        <span>As a buyer, I want to add items to wishlist so I can save them for
+                                            later</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span
+                                            class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-xs mr-2 mt-0.5">US-3</span>
+                                        <span>As a buyer, I want to checkout securely via Stripe so I can purchase
+                                            crafts safely</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span
+                                            class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-xs mr-2 mt-0.5">US-4</span>
+                                        <span>As a seller, I want to manage my inventory so I can track stock
+                                            levels</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span
+                                            class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-xs mr-2 mt-0.5">US-5</span>
+                                        <span>As a buyer, I want to leave reviews so I can share my experience</span>
+                                    </li>
+                                </ul>
+
+                                <h5 class="font-semibold text-gray-900 mt-4 mb-2">Technical Requirements</h5>
+                                <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                                    <li>Stripe payment gateway integration</li>
+                                    <li>User authentication (OAuth + email)</li>
+                                    <li>Real-time inventory updates</li>
+                                    <li>Image upload and optimization</li>
+                                    <li>Review rating system (1-5 stars)</li>
+                                    <li>Responsive design (mobile-first)</li>
+                                </ul>
+
+                                <h5 class="font-semibold text-gray-900 mt-4 mb-2">Success Metrics</h5>
+                                <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                                    <li>100+ sellers onboarded in first month</li>
+                                    <li>1000+ products listed</li>
+                                    <li>Payment success rate &gt; 98%</li>
+                                    <li>Average page load &lt; 2 seconds</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-200 p-4 bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <button class="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
+                                    <i class="fas fa-edit mr-1"></i> Request Changes
+                                </button>
+                                <button onclick="showView('dashboard')"
+                                    class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 flex items-center">
+                                    <i class="fas fa-check mr-2"></i> Approve & Start Development
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Dashboard View -->
+    <div id="view-dashboard" class="view">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 sm:px-0">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">E-commerce Platform</h1>
+                        <p class="text-sm text-gray-500 mt-1">Created 5 days ago • Sprint 2 of 4</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="showView('conversation')"
+                            class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center">
+                            <i class="fas fa-comments mr-2"></i> Talk to Agents
+                        </button>
+                        <button onclick="showView('board')"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center">
+                            <i class="fas fa-th mr-2"></i> Sprint Board
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Critical Bugs Alert -->
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
+                            <div>
+                                <p class="font-medium text-red-800">2 Critical Bugs Require Attention</p>
+                                <p class="text-sm text-red-700">Payment gateway timeout, Authentication token expiry</p>
+                            </div>
+                        </div>
+                        <button onclick="showView('bugs')"
+                            class="text-red-700 hover:text-red-900 font-medium text-sm">View Bugs →</button>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Sprint Progress</p>
+                                <p class="text-2xl font-bold text-gray-900">68%</p>
+                            </div>
+                            <div class="bg-indigo-100 p-3 rounded-full">
+                                <i class="fas fa-chart-line text-indigo-600 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 bg-gray-200 rounded-full h-2">
+                            <div class="bg-indigo-600 h-2 rounded-full" style="width: 68%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Tasks Completed</p>
+                                <p class="text-2xl font-bold text-gray-900">12/18</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-tasks text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-green-600 mt-2">+3 today</p>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Open Bugs</p>
+                                <p class="text-2xl font-bold text-gray-900">4</p>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-full">
+                                <i class="fas fa-bug text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-red-600 mt-2">2 critical</p>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Velocity</p>
+                                <p class="text-2xl font-bold text-gray-900">32 pts</p>
+                            </div>
+                            <div class="bg-purple-100 p-3 rounded-full">
+                                <i class="fas fa-bolt text-purple-600 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">per sprint</p>
+                    </div>
+                </div>
+
+                <!-- Main Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Active Agents -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow border border-gray-200">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-900">Active Agents</h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div
+                                class="flex items-center justify-between p-4 bg-pink-50 rounded-lg border border-pink-200">
+                                <div class="flex items-center space-x-3">
+                                    <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff"
+                                        class="h-12 w-12 rounded-full">
+                                    <div>
+                                        <p class="font-medium text-gray-900">Alice - Product Manager</p>
+                                        <p class="text-sm text-gray-600 flex items-center">
+                                            <span class="w-2 h-2 bg-green-400 rounded-full mr-1 pulse-dot"></span>
+                                            Reviewing design approval
+                                        </p>
+                                    </div>
+                                </div>
+                                <button class="text-pink-600 hover:text-pink-700 text-sm font-medium">Message</button>
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <div class="flex items-center space-x-3">
+                                    <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff"
+                                        class="h-12 w-12 rounded-full">
+                                    <div>
+                                        <p class="font-medium text-gray-900">Bob - Architect</p>
+                                        <p class="text-sm text-gray-600 flex items-center">
+                                            <span class="w-2 h-2 bg-green-400 rounded-full mr-1 pulse-dot"></span>
+                                            Designing payment module
+                                        </p>
+                                    </div>
+                                </div>
+                                <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">Message</button>
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                                <div class="flex items-center space-x-3">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff"
+                                        class="h-12 w-12 rounded-full">
+                                    <div>
+                                        <p class="font-medium text-gray-900">Alex - Engineer</p>
+                                        <p class="text-sm text-gray-600 flex items-center">
+                                            <span class="w-2 h-2 bg-yellow-400 rounded-full mr-1 pulse-dot"></span>
+                                            Fixing BUG-001
+                                        </p>
+                                    </div>
+                                </div>
+                                <button class="text-green-600 hover:text-green-700 text-sm font-medium">Message</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="bg-white rounded-lg shadow border border-gray-200">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-900">Recent Activity</h3>
+                        </div>
+                        <div class="p-4 space-y-3 max-h-96 overflow-y-auto">
+                            <div class="flex items-start space-x-3">
+                                <div class="bg-green-100 p-2 rounded-full">
+                                    <i class="fas fa-check text-green-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-900">Alex completed TASK-012</p>
+                                    <p class="text-xs text-gray-500">2 minutes ago</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div class="bg-red-100 p-2 rounded-full">
+                                    <i class="fas fa-bug text-red-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-900">BUG-003 created from test failure</p>
+                                    <p class="text-xs text-gray-500">15 minutes ago</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div class="bg-blue-100 p-2 rounded-full">
+                                    <i class="fas fa-comment text-blue-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-900">Bob asked Alice for approval</p>
+                                    <p class="text-xs text-gray-500">1 hour ago</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div class="bg-purple-100 p-2 rounded-full">
+                                    <i class="fas fa-code text-purple-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-900">Alex committed payment.py v3</p>
+                                    <p class="text-xs text-gray-500">2 hours ago</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div class="bg-yellow-100 p-2 rounded-full">
+                                    <i class="fas fa-tasks text-yellow-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-900">TASK-011 moved to Review</p>
+                                    <p class="text-xs text-gray-500">3 hours ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <button onclick="showModal('feature-request')"
+                        class="bg-white border border-gray-300 p-4 rounded-lg hover:shadow-lg transition text-left">
+                        <i class="fas fa-lightbulb text-yellow-500 text-2xl mb-2"></i>
+                        <h4 class="font-semibold text-gray-900">Request Feature</h4>
+                        <p class="text-sm text-gray-600">Propose new functionality</p>
+                    </button>
+
+                    <button onclick="showModal('change-request')"
+                        class="bg-white border border-gray-300 p-4 rounded-lg hover:shadow-lg transition text-left">
+                        <i class="fas fa-edit text-blue-500 text-2xl mb-2"></i>
+                        <h4 class="font-semibold text-gray-900">Change Request</h4>
+                        <p class="text-sm text-gray-600">Modify existing features</p>
+                    </button>
+
+                    <button onclick="showModal('bug-report')"
+                        class="bg-white border border-gray-300 p-4 rounded-lg hover:shadow-lg transition text-left">
+                        <i class="fas fa-bug text-red-500 text-2xl mb-2"></i>
+                        <h4 class="font-semibold text-gray-900">Report Bug</h4>
+                        <p class="text-sm text-gray-600">Submit issue manually</p>
+                    </button>
+
+                    <button onclick="showModal('implementation-plan')"
+                        class="bg-white border border-gray-300 p-4 rounded-lg hover:shadow-lg transition text-left">
+                        <i class="fas fa-tasks text-purple-500 text-2xl mb-2"></i>
+                        <h4 class="font-semibold text-gray-900">Implementation Plan</h4>
+                        <p class="text-sm text-gray-600">View development roadmap</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sprint Board View -->
+    <div id="view-board" class="view">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 sm:px-0">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Sprint 2 Board</h1>
+                        <p class="text-sm text-gray-500 mt-1">3 days remaining • 68% complete</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="showView('dashboard')"
+                            class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                        </button>
+                        <select class="border border-gray-300 rounded-lg px-4 py-2 bg-white">
+                            <option>Sprint 2 (Current)</option>
+                            <option>Sprint 1</option>
+                            <option>All Sprints</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sprint Stats -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <p class="text-sm text-gray-500">Story Points</p>
+                        <p class="text-2xl font-bold text-gray-900">22/32</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <p class="text-sm text-gray-500">Tasks Done</p>
+                        <p class="text-2xl font-bold text-green-600">12</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <p class="text-sm text-gray-500">In Progress</p>
+                        <p class="text-2xl font-bold text-blue-600">4</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <p class="text-sm text-gray-500">Blocked</p>
+                        <p class="text-2xl font-bold text-red-600">2</p>
+                    </div>
+                </div>
+
+                <!-- Kanban Board -->
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- To Do Column -->
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-gray-900">To Do</h3>
+                            <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">4</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-indigo-600">TASK-015</span>
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">5 pts</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-2">Implement product search</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full" title="Alex">
+                                    <span class="text-xs text-gray-500">Epic: Search</span>
+                                </div>
+                            </div>
+
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-indigo-600">TASK-016</span>
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">3 pts</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-2">Add wishlist feature</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <span class="text-xs text-gray-500">Epic: Features</span>
+                                </div>
+                            </div>
+
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-indigo-600">TASK-017</span>
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">2 pts</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-2">Email notifications</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <span class="text-xs text-gray-500">Epic: Notifications</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- In Progress Column -->
+                    <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-gray-900">In Progress</h3>
+                            <span class="bg-blue-200 text-blue-700 text-xs px-2 py-1 rounded-full">4</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div
+                                class="task-card bg-white rounded-lg p-3 shadow border border-red-200 severity-critical">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fas fa-bug text-red-500 text-xs"></i>
+                                        <span class="text-xs font-medium text-red-600">BUG-001</span>
+                                    </div>
+                                    <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">P0</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-2">Payment gateway timeout</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <span class="text-xs text-red-600">Critical</span>
+                                </div>
+                            </div>
+
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-indigo-600">TASK-012</span>
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">8 pts</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-2">Stripe integration</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <span class="text-xs text-gray-500">Epic: Payments</span>
+                                </div>
+                            </div>
+
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-indigo-600">TASK-013</span>
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">5 pts</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-2">Review system UI</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <span class="text-xs text-gray-500">Epic: Reviews</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review Column -->
+                    <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-gray-900">Review</h3>
+                            <span class="bg-yellow-200 text-yellow-700 text-xs px-2 py-1 rounded-full">3</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-indigo-600">TASK-010</span>
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">3 pts</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-2">User authentication</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full" title="Alice reviewing">
+                                    <span class="text-xs text-yellow-600">Pending approval</span>
+                                </div>
+                            </div>
+
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-indigo-600">TASK-011</span>
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">5 pts</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-2">Product catalog API</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full" title="Bob reviewing">
+                                    <span class="text-xs text-yellow-600">Code review</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Done Column -->
+                    <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-gray-900">Done</h3>
+                            <span class="bg-green-200 text-green-700 text-xs px-2 py-1 rounded-full">12</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200 opacity-75">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-gray-500 line-through">TASK-008</span>
+                                    <i class="fas fa-check-circle text-green-500"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-500 mb-2 line-through">Database schema</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <span class="text-xs text-green-600">Completed</span>
+                                </div>
+                            </div>
+
+                            <div class="task-card bg-white rounded-lg p-3 shadow border border-gray-200 opacity-75">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-gray-500 line-through">TASK-009</span>
+                                    <i class="fas fa-check-circle text-green-500"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-500 mb-2 line-through">REST API endpoints</p>
+                                <div class="flex items-center justify-between">
+                                    <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                        class="h-6 w-6 rounded-full">
+                                    <span class="text-xs text-green-600">Completed</span>
+                                </div>
+                            </div>
+
+                            <button class="w-full text-center text-sm text-gray-500 hover:text-gray-700 py-2">
+                                View all 12 completed tasks →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Conversation View -->
+    <div id="view-conversation" class="view">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 sm:px-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-900">Agent Collaboration</h1>
+                    <button onclick="showView('dashboard')"
+                        class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Thread List -->
+                    <div class="bg-white rounded-lg shadow border border-gray-200">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-900">Conversation Threads</h3>
+                        </div>
+                        <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+                            <div class="p-4 hover:bg-gray-50 cursor-pointer bg-indigo-50">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=32"
+                                            class="h-8 w-8 rounded-full">
+                                        <i class="fas fa-arrow-right text-gray-400 text-xs"></i>
+                                        <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=32"
+                                            class="h-8 w-8 rounded-full">
+                                    </div>
+                                    <span class="text-xs text-gray-500">10m ago</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">Design Approval Request</p>
+                                <p class="text-xs text-gray-600 truncate">Bob: Can you review the payment flow design?
+                                </p>
+                            </div>
+
+                            <div class="p-4 hover:bg-gray-50 cursor-pointer">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=32"
+                                            class="h-8 w-8 rounded-full">
+                                        <i class="fas fa-arrow-right text-gray-400 text-xs"></i>
+                                        <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=32"
+                                            class="h-8 w-8 rounded-full">
+                                    </div>
+                                    <span class="text-xs text-gray-500">1h ago</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">API Clarification</p>
+                                <p class="text-xs text-gray-600 truncate">Alex: What's the rate limit for the API?</p>
+                            </div>
+
+                            <div class="p-4 hover:bg-gray-50 cursor-pointer">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <img src="https://ui-avatars.com/api/?name=You&background=6B7280&color=fff&size=32"
+                                            class="h-8 w-8 rounded-full">
+                                        <i class="fas fa-arrow-right text-gray-400 text-xs"></i>
+                                        <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=32"
+                                            class="h-8 w-8 rounded-full">
+                                    </div>
+                                    <span class="text-xs text-gray-500">2h ago</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">Bug Priority Question</p>
+                                <p class="text-xs text-gray-600 truncate">You: Should we prioritize BUG-001 first?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Thread -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow border border-gray-200">
+                        <div class="border-b border-gray-200 p-4 bg-gradient-to-r from-blue-50 to-purple-50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff"
+                                        class="h-10 w-10 rounded-full">
+                                    <i class="fas fa-arrow-right text-gray-400"></i>
+                                    <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff"
+                                        class="h-10 w-10 rounded-full">
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900">Design Approval Request</h3>
+                                        <p class="text-xs text-gray-500">Thread #THR-024 • Started 10 minutes ago</p>
+                                    </div>
+                                </div>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Awaiting
+                                    Response</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6 h-96 overflow-y-auto space-y-4">
+                            <!-- Bob's message -->
+                            <div class="flex items-start space-x-3">
+                                <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=32"
+                                    class="h-8 w-8 rounded-full">
+                                <div class="flex-1">
+                                    <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                                        <p class="text-sm font-medium text-gray-900 mb-1">Bob - Architect</p>
+                                        <p class="text-sm text-gray-700 mb-2">Hi Alice, I've completed the payment flow
+                                            design. Can you review and approve?</p>
+                                        <div class="bg-white rounded border border-gray-200 p-2 text-xs">
+                                            <p class="font-medium text-gray-900 mb-1">📋 Attachment:
+                                                payment_flow_design_v2.pdf</p>
+                                            <p class="text-gray-600">Design includes: Stripe integration, error
+                                                handling, receipt generation</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">10 minutes ago</p>
+                                </div>
+                            </div>
+
+                            <!-- Alice's response -->
+                            <div class="flex items-start space-x-3 justify-end">
+                                <div class="flex-1 text-right">
+                                    <div
+                                        class="bg-pink-50 rounded-lg p-3 border border-pink-200 inline-block text-left">
+                                        <p class="text-sm font-medium text-gray-900 mb-1">Alice - Product Manager</p>
+                                        <p class="text-sm text-gray-700">Thanks Bob! I'm reviewing now. Quick question:
+                                            Does the design handle refunds?</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">8 minutes ago</p>
+                                </div>
+                                <img src="https://ui-avatars.com/api/?name=Alice&background=EC4899&color=fff&size=32"
+                                    class="h-8 w-8 rounded-full">
+                            </div>
+
+                            <!-- Bob's clarification -->
+                            <div class="flex items-start space-x-3">
+                                <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=32"
+                                    class="h-8 w-8 rounded-full">
+                                <div class="flex-1">
+                                    <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                                        <p class="text-sm font-medium text-gray-900 mb-1">Bob - Architect</p>
+                                        <p class="text-sm text-gray-700">Yes! Refund flow is on page 3. It supports
+                                            partial and full refunds with automatic customer notification.</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">5 minutes ago</p>
+                                </div>
+                            </div>
+
+                            <!-- Approval pending banner -->
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium text-yellow-900"><i class="fas fa-clock mr-2"></i>Approval
+                                            Required</p>
+                                        <p class="text-sm text-yellow-700">Alice needs to approve before Alex can start
+                                            coding</p>
+                                    </div>
+                                    <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                        <i class="fas fa-check mr-2"></i> Approve
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-200 p-4">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                <p class="text-sm text-blue-900 flex items-center">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    You can only message <strong class="mx-1">Alice (Product Manager)</strong> - the
+                                    team lead. Alice will engage other team members as needed.
+                                </p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="text" placeholder="Type your message to Alice..."
+                                    class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bugs View -->
+    <div id="view-bugs" class="view">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 sm:px-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-900">Bug Tracker</h1>
+                    <div class="flex space-x-3">
+                        <button onclick="showView('dashboard')"
+                            class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                            <i class="fas fa-plus mr-2"></i> Report Bug
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bug Stats -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <p class="text-sm text-gray-500">Total Bugs</p>
+                        <p class="text-2xl font-bold text-gray-900">15</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4 border border-red-200">
+                        <p class="text-sm text-gray-500">Critical</p>
+                        <p class="text-2xl font-bold text-red-600">2</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4 border border-green-200">
+                        <p class="text-sm text-gray-500">Fixed This Sprint</p>
+                        <p class="text-2xl font-bold text-green-600">8</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <p class="text-sm text-gray-500">Avg Fix Time</p>
+                        <p class="text-2xl font-bold text-gray-900">4.2h</p>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-white rounded-lg shadow border border-gray-200 p-4 mb-6">
+                    <div class="flex space-x-4">
+                        <select class="border border-gray-300 rounded px-3 py-2">
+                            <option>All Severities</option>
+                            <option>Critical</option>
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+                        <select class="border border-gray-300 rounded px-3 py-2">
+                            <option>All Status</option>
+                            <option>Open</option>
+                            <option>In Progress</option>
+                            <option>Fixed</option>
+                            <option>Verified</option>
+                        </select>
+                        <select class="border border-gray-300 rounded px-3 py-2">
+                            <option>All Agents</option>
+                            <option>Alex</option>
+                            <option>Bob</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Bug List -->
+                <div class="bg-white rounded-lg shadow border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bug ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Severity
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned To
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="severity-critical hover:bg-gray-50 cursor-pointer">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-red-600">BUG-001</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-sm font-medium text-gray-900">Payment gateway timeout</p>
+                                    <p class="text-xs text-gray-500">Stripe API calls timing out after 30s</p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Critical</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">In
+                                        Progress</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                            class="h-6 w-6 rounded-full mr-2">
+                                        <span class="text-sm">Alex</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2h ago</td>
+                            </tr>
+
+                            <tr class="severity-critical hover:bg-gray-50 cursor-pointer">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-red-600">BUG-002</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-sm font-medium text-gray-900">Auth token expiry</p>
+                                    <p class="text-xs text-gray-500">Users logged out unexpectedly</p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Critical</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Open</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                            class="h-6 w-6 rounded-full mr-2">
+                                        <span class="text-sm">Alex</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5h ago</td>
+                            </tr>
+
+                            <tr class="severity-high hover:bg-gray-50 cursor-pointer">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-orange-600">BUG-003</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-sm font-medium text-gray-900">Search not returning results</p>
+                                    <p class="text-xs text-gray-500">Empty results for valid queries</p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span
+                                        class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">High</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span
+                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Fixed</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img src="https://ui-avatars.com/api/?name=Alex&background=10B981&color=fff&size=24"
+                                            class="h-6 w-6 rounded-full mr-2">
+                                        <span class="text-sm">Alex</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1d ago</td>
+                            </tr>
+
+                            <tr class="severity-medium hover:bg-gray-50 cursor-pointer">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-yellow-600">BUG-004</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-sm font-medium text-gray-900">Image upload slow</p>
+                                    <p class="text-xs text-gray-500">Takes 10s+ to upload images</p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span
+                                        class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Medium</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Open</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm text-gray-500">Unassigned</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2d ago</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version History View -->
+    <div id="view-history" class="view">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 sm:px-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-900">Version History</h1>
+                    <button onclick="showView('dashboard')"
+                        class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Timeline -->
+                    <div class="bg-white rounded-lg shadow border border-gray-200 p-6">
+                        <h3 class="font-semibold text-gray-900 mb-4">Document Timeline</h3>
+                        <div class="space-y-4">
+                            <div
+                                class="flex items-start space-x-3 cursor-pointer p-3 hover:bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
+                                <div class="bg-indigo-100 p-2 rounded-full mt-1">
+                                    <i class="fas fa-file-code text-indigo-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">payment.py v3</p>
+                                    <p class="text-xs text-gray-600">Fixed timeout bug</p>
+                                    <p class="text-xs text-gray-500 mt-1">By Alex • 2 hours ago</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3 cursor-pointer p-3 hover:bg-gray-50 rounded-lg">
+                                <div class="bg-purple-100 p-2 rounded-full mt-1">
+                                    <i class="fas fa-file-alt text-purple-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">design_v2.pdf</p>
+                                    <p class="text-xs text-gray-600">Added refund flow</p>
+                                    <p class="text-xs text-gray-500 mt-1">By Bob • 1 day ago</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3 cursor-pointer p-3 hover:bg-gray-50 rounded-lg">
+                                <div class="bg-pink-100 p-2 rounded-full mt-1">
+                                    <i class="fas fa-file-alt text-pink-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">PRD v2</p>
+                                    <p class="text-xs text-gray-600">Added review feature</p>
+                                    <p class="text-xs text-gray-500 mt-1">By Alice • 2 days ago</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3 cursor-pointer p-3 hover:bg-gray-50 rounded-lg">
+                                <div class="bg-green-100 p-2 rounded-full mt-1">
+                                    <i class="fas fa-file-code text-green-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">auth.py v2</p>
+                                    <p class="text-xs text-gray-600">Improved token handling</p>
+                                    <p class="text-xs text-gray-500 mt-1">By Alex • 3 days ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diff Viewer -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow border border-gray-200">
+                        <div class="border-b border-gray-200 p-4 bg-gradient-to-r from-indigo-50 to-purple-50">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-semibold text-gray-900">payment.py Changes</h3>
+                                <div class="flex items-center space-x-3">
+                                    <select class="border border-gray-300 rounded px-3 py-1 text-sm">
+                                        <option>v2 → v3 (Current)</option>
+                                        <option>v1 → v2</option>
+                                    </select>
+                                    <button class="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
+                                        <i class="fas fa-undo mr-1"></i> Rollback
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <p class="text-sm font-medium text-gray-900">Version 3</p>
+                                    <p class="text-xs text-gray-500">By Alex • 2 hours ago</p>
+                                </div>
+                                <p class="text-sm text-gray-700">Fixed payment gateway timeout by adding retry logic and
+                                    connection pooling</p>
+                            </div>
+
+                            <div class="font-mono text-xs space-y-1">
+                                <div class="bg-gray-100 px-3 py-1 text-gray-600">
+                                    @@ Line 45,10 +45,15 @@
+                                </div>
+
+                                <div class="px-3 py-1">
+                                    <span class="text-gray-600">def process_payment(amount, token):</span>
+                                </div>
+
+                                <div class="diff-removed px-3 py-1">
+                                    <span class="text-red-700">- response = stripe.charge(amount, token)</span>
+                                </div>
+
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+ max_retries = 3</span>
+                                </div>
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+ for attempt in range(max_retries):</span>
+                                </div>
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+ try:</span>
+                                </div>
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+ response = stripe.charge(amount, token,
+                                        timeout=10)</span>
+                                </div>
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+ break</span>
+                                </div>
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+ except TimeoutError:</span>
+                                </div>
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+ if attempt == max_retries - 1:</span>
+                                </div>
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+ raise PaymentError("Gateway timeout")</span>
+                                </div>
+
+                                <div class="px-3 py-1">
+                                    <span class="text-gray-600"> return response</span>
+                                </div>
+
+                                <div class="bg-gray-100 px-3 py-1 text-gray-600 mt-4">
+                                    @@ Line 120,5 +125,8 @@
+                                </div>
+
+                                <div class="diff-removed px-3 py-1">
+                                    <span class="text-red-700">-# TODO: Add connection pooling</span>
+                                </div>
+
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+# Connection pool for improved performance</span>
+                                </div>
+                                <div class="diff-added px-3 py-1">
+                                    <span class="text-green-700">+stripe.http_client =
+                                        urllib3.PoolManager(maxsize=10)</span>
+                                </div>
+                            </div>
+
+                            <div
+                                class="mt-6 flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                                <div>
+                                    <p class="text-sm font-medium text-green-900">Test Results</p>
+                                    <p class="text-xs text-green-700">All 24 tests passed after this change</p>
+                                </div>
+                                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Explorer View -->
+    <div id="view-files" class="view">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 sm:px-0">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Project Files</h1>
+                        <p class="text-sm text-gray-500 mt-1">E-commerce Platform • workspace/projects/proj_001/</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="showView('dashboard')"
+                            class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                            <i class="fas fa-download mr-2"></i> Download All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Directory Tree -->
+                    <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
+                        <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-folder-tree mr-2 text-indigo-600"></i>
+                            Directory Structure
+                        </h3>
+                        <div class="space-y-1 text-sm">
+                            <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <i class="fas fa-folder text-yellow-500 mr-2"></i>
+                                <span class="font-medium">requirements/</span>
+                            </div>
+                            <div class="ml-4 space-y-1">
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-file-alt text-pink-500 mr-2"></i>
+                                    <span>prd_v2.json</span>
+                                </div>
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-file-alt text-pink-500 mr-2"></i>
+                                    <span>user_stories.json</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer bg-indigo-50">
+                                <i class="fas fa-folder-open text-blue-500 mr-2"></i>
+                                <span class="font-medium">design/</span>
+                            </div>
+                            <div class="ml-4 space-y-1">
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                                    <span>architecture_v2.pdf</span>
+                                </div>
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-file-code text-blue-500 mr-2"></i>
+                                    <span>api_schema.yaml</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <i class="fas fa-folder text-yellow-500 mr-2"></i>
+                                <span class="font-medium">src/</span>
+                            </div>
+                            <div class="ml-4 space-y-1">
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-file-code text-green-500 mr-2"></i>
+                                    <span>main.py</span>
+                                </div>
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-file-code text-green-500 mr-2"></i>
+                                    <span>auth.py</span>
+                                </div>
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-file-code text-green-500 mr-2"></i>
+                                    <span>payment.py</span>
+                                </div>
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-file-code text-green-500 mr-2"></i>
+                                    <span>models.py</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <i class="fas fa-folder text-yellow-500 mr-2"></i>
+                                <span class="font-medium">tests/</span>
+                            </div>
+                            <div class="ml-4 space-y-1">
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-vial text-purple-500 mr-2"></i>
+                                    <span>test_auth.py</span>
+                                </div>
+                                <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <i class="fas fa-vial text-purple-500 mr-2"></i>
+                                    <span>test_payment.py</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <i class="fas fa-folder text-yellow-500 mr-2"></i>
+                                <span class="font-medium">docs/</span>
+                            </div>
+                            <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <i class="fas fa-file text-gray-500 mr-2"></i>
+                                <span>README.md</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File List & Preview -->
+                    <div class="lg:col-span-3 bg-white rounded-lg shadow border border-gray-200">
+                        <div class="border-b border-gray-200 p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-semibold text-gray-900">design/ Directory</h3>
+                                    <p class="text-xs text-gray-500">2 files • Last updated 1 day ago</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="text-sm text-indigo-600 hover:text-indigo-700">
+                                        <i class="fas fa-grid-2 mr-1"></i> Grid
+                                    </button>
+                                    <button class="text-sm text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-list mr-1"></i> List
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Cards Grid -->
+                        <div class="p-6 grid grid-cols-2 gap-4">
+                            <div
+                                class="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition cursor-pointer">
+                                <div class="flex items-center justify-between mb-3">
+                                    <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
+                                    <div class="flex space-x-1">
+                                        <button class="p-2 hover:bg-gray-100 rounded">
+                                            <i class="fas fa-download text-gray-500 text-sm"></i>
+                                        </button>
+                                        <button onclick="showView('history')" class="p-2 hover:bg-gray-100 rounded">
+                                            <i class="fas fa-history text-gray-500 text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-medium text-gray-900 mb-1">architecture_v2.pdf</h4>
+                                <div class="flex items-center justify-between text-xs text-gray-500">
+                                    <span>1.2 MB</span>
+                                    <span>v2</span>
+                                </div>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=20"
+                                        class="h-5 w-5 rounded-full">
+                                    <span class="text-xs text-gray-600">Bob • 1 day ago</span>
+                                </div>
+                            </div>
+
+                            <div
+                                class="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition cursor-pointer">
+                                <div class="flex items-center justify-between mb-3">
+                                    <i class="fas fa-file-code text-blue-500 text-3xl"></i>
+                                    <div class="flex space-x-1">
+                                        <button class="p-2 hover:bg-gray-100 rounded">
+                                            <i class="fas fa-download text-gray-500 text-sm"></i>
+                                        </button>
+                                        <button class="p-2 hover:bg-gray-100 rounded">
+                                            <i class="fas fa-history text-gray-500 text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-medium text-gray-900 mb-1">api_schema.yaml</h4>
+                                <div class="flex items-center justify-between text-xs text-gray-500">
+                                    <span>24 KB</span>
+                                    <span>v1</span>
+                                </div>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <img src="https://ui-avatars.com/api/?name=Bob&background=3B82F6&color=fff&size=20"
+                                        class="h-5 w-5 rounded-full">
+                                    <span class="text-xs text-gray-600">Bob • 2 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Preview -->
+                        <div class="border-t border-gray-200 p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">Quick Preview: api_schema.yaml</h3>
+                            <div class="bg-gray-900 rounded-lg p-4 text-gray-100 font-mono text-sm overflow-x-auto">
+                                <pre>openapi: 3.0.0
+info:
+  title: E-commerce API
+  version: 1.0.0
+paths:
+  /api/products:
+    get:
+      summary: List all products
+      responses:
+        '200':
+          description: Success
+  /api/checkout:
+    post:
+      summary: Process payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                token:
+                  type: string</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        onclick="closeModal()">
+        <!-- Feature Request Modal -->
+        <div id="modal-feature-request" class="modal-content hidden bg-white rounded-lg shadow-xl max-w-2xl w-full"
+            onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-900">Request New Feature</h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Feature Title</label>
+                    <input type="text" placeholder="e.g., Add dark mode support"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea rows="4" placeholder="Describe the feature and why it's needed..."
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        <option>Low - Nice to have</option>
+                        <option>Medium - Important</option>
+                        <option>High - Critical for business</option>
+                    </select>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-sm text-blue-900">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Alice (PM) will review your request and discuss implementation with the team
+                    </p>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button onclick="closeModal()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <button class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">Submit to
+                    Alice</button>
+            </div>
+        </div>
+
+        <!-- Change Request Modal -->
+        <div id="modal-change-request" class="modal-content hidden bg-white rounded-lg shadow-xl max-w-2xl w-full"
+            onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-900">Request Change</h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">What needs to change?</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        <option>Feature modification</option>
+                        <option>Design update</option>
+                        <option>Requirement clarification</option>
+                        <option>Performance improvement</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Behavior</label>
+                    <textarea rows="3" placeholder="Describe how it works now..."
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Requested Behavior</label>
+                    <textarea rows="3" placeholder="Describe how it should work..."
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Change</label>
+                    <textarea rows="2" placeholder="Why is this change needed?"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button onclick="closeModal()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Submit to Alice</button>
+            </div>
+        </div>
+
+        <!-- Bug Report Modal -->
+        <div id="modal-bug-report" class="modal-content hidden bg-white rounded-lg shadow-xl max-w-2xl w-full"
+            onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-900">Report Bug</h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bug Title</label>
+                    <input type="text" placeholder="e.g., Payment button not responding"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Steps to Reproduce</label>
+                    <textarea rows="4"
+                        placeholder="1. Go to checkout&#10;2. Click payment button&#10;3. Nothing happens"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Severity</label>
+                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            <option>Low - Minor issue</option>
+                            <option>Medium - Affects some users</option>
+                            <option>High - Major functionality broken</option>
+                            <option>Critical - System down</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Affected Area</label>
+                        <input type="text" placeholder="e.g., payment.py"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Expected vs Actual Behavior</label>
+                    <textarea rows="2" placeholder="Expected: Payment processes. Actual: Button does nothing."
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button onclick="closeModal()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <button onclick="closeModal(); showView('bugs')"
+                    class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">Create Bug Report</button>
+            </div>
+        </div>
+
+        <!-- Implementation Plan Modal -->
+        <div id="modal-implementation-plan"
+            class="modal-content hidden bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-900">Implementation Plan</h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">E-commerce Platform Development</h3>
+                    <p class="text-gray-700">4 sprints • 8 weeks estimated • 18 tasks</p>
+                </div>
+
+                <!-- Sprint Timeline -->
+                <div class="space-y-6">
+                    <div class="border-l-4 border-green-500 pl-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-gray-900">Sprint 1: Foundation ✓</h4>
+                            <span class="text-sm text-green-600">Completed</span>
+                        </div>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li>✓ Database schema design</li>
+                            <li>✓ REST API endpoints</li>
+                            <li>✓ Authentication system</li>
+                            <li>✓ Basic CRUD operations</li>
+                        </ul>
+                    </div>
+
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-gray-900">Sprint 2: Core Features (Current)</h4>
+                            <span class="text-sm text-blue-600">68% Complete</span>
+                        </div>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li>✓ Product catalog</li>
+                            <li>✓ Shopping cart</li>
+                            <li>⏳ Stripe payment integration</li>
+                            <li>⏳ Inventory management</li>
+                            <li>⏳ Review system</li>
+                        </ul>
+                    </div>
+
+                    <div class="border-l-4 border-gray-300 pl-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-gray-900">Sprint 3: Advanced Features</h4>
+                            <span class="text-sm text-gray-500">Planned</span>
+                        </div>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li>○ Search and filtering</li>
+                            <li>○ Wishlist feature</li>
+                            <li>○ Email notifications</li>
+                            <li>○ Order tracking</li>
+                            <li>○ Analytics dashboard</li>
+                        </ul>
+                    </div>
+
+                    <div class="border-l-4 border-gray-300 pl-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-gray-900">Sprint 4: Polish & Deploy</h4>
+                            <span class="text-sm text-gray-500">Planned</span>
+                        </div>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li>○ Performance optimization</li>
+                            <li>○ Security audit</li>
+                            <li>○ Mobile responsiveness</li>
+                            <li>○ Production deployment</li>
+                            <li>○ Documentation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tech Stack -->
+                <div class="mt-8 bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-900 mb-3">Technology Stack</h4>
+                    <div class="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <p class="font-medium text-gray-700">Backend</p>
+                            <p class="text-gray-600">Python, FastAPI, PostgreSQL</p>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-700">Frontend</p>
+                            <p class="text-gray-600">React, TailwindCSS, TypeScript</p>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-700">Infrastructure</p>
+                            <p class="text-gray-600">Docker, AWS, Redis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end">
+                <button onclick="closeModal()"
+                    class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Show selected view
+            document.getElementById('view-' + viewName).classList.add('active');
+
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('border-indigo-500', 'text-gray-900');
+                link.classList.add('border-transparent', 'text-gray-500');
+            });
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function showModal(modalName) {
+            const overlay = document.getElementById('modal-overlay');
+            const modal = document.getElementById('modal-' + modalName);
+
+            overlay.classList.remove('hidden');
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            const modals = document.querySelectorAll('.modal-content');
+
+            overlay.classList.add('hidden');
+            modals.forEach(modal => modal.classList.add('hidden'));
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const dots = document.querySelectorAll('.pulse-dot');
+            dots.forEach(dot => {
+                dot.style.opacity = Math.random() > 0.5 ? '1' : '0.5';
+            });
+        }, 2000);
+    </script>
+
+</body>
+
+</html>

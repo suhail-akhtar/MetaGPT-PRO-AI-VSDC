@@ -97,10 +97,21 @@ async def approve_requirements(req: ApprovalRequest):
     """
     try:
         project_id = await conversation_manager.approve(req.conversation_id)
+        
+        # Trigger project execution in background
+        req_text = await conversation_manager.get_approved_requirement_text(req.conversation_id)
+        if req_text:
+            try:
+                from metagpt.api.services.project_runner import project_runner
+                await project_runner.run_project(project_id, req_text)
+                logger.info(f"Triggered project execution for {project_id}")
+            except Exception as e:
+                logger.error(f"Failed to trigger project runner: {e}")
+        
         return ApprovalResponse(
             project_id=project_id,
             status="approved",
-            message="Requirements approved. Development can now start."
+            message="Requirements approved. Development started."
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

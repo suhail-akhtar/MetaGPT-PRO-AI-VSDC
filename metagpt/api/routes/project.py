@@ -189,6 +189,18 @@ async def get_metrics(project_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/{project_id}/status")
+async def get_project_status(project_id: str):
+    """Get real-time execution status"""
+    from metagpt.api.services.project_runner import project_runner
+    is_running = project_runner.is_running(project_id)
+    return {
+        "project_id": project_id,
+        "is_running": is_running,
+        "status": "running" if is_running else "idle" # simple status for now
+    }
+
+
 @router.websocket("/{project_id}/board/stream")
 async def board_websocket(websocket: WebSocket, project_id: str):
     """WebSocket for real-time board updates"""
