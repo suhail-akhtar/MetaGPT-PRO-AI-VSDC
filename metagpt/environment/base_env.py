@@ -178,7 +178,7 @@ class Environment(ExtEnv):
         In accordance with the Message routing structure design in Chapter 2.2.1 of RFC 116, as already planned
         in RFC 113 for the entire system, the routing information in the Message is only responsible for
         specifying the message recipient, without concern for where the message recipient is located. How to
-        route the message to the message recipient is a problem addressed by the transport framework designed
+        route the message to the transport framework designed
         in RFC 113.
         """
         logger.debug(f"publish_message: {message.dump()}")
@@ -191,8 +191,50 @@ class Environment(ExtEnv):
         if not found:
             logger.warning(f"Message no recipients: {message.dump()}")
         self.history.add(message)  # For debug
+        
+        # Hook for collaboration layer - capture inter-agent communications
+        self._on_message_published(message)
 
         return True
+    
+    def _on_message_published(self, message: Message):
+        """Hook for collaboration layer to capture agent communications"""
+        try:
+            # Only capture if collaboration is initialized
+            if not hasattr(self, '_collaboration_enabled') or not self._collaboration_enabled:
+                return
+            
+            # Import here to avoid circular imports
+            from metagpt.collaboration.agent_messenger import messenger
+            from metagpt.collaboration.schemas import MessageType
+            import asyncio
+            
+            # Extract sender and recipient info
+            sender = message.role if hasattr(message, 'role') else "System"
+            content = message.content if hasattr(message, 'content') else str(message)
+            
+            # Determine message type based on content
+            msg_type = MessageType.NOTIFICATION
+            if "approve" in content.lower() or "review" in content.lower():
+                msg_type = MessageType.APPROVAL_REQUEST
+            elif "?" in content:
+                msg_type = MessageType.QUESTION
+            
+            # Send to collaboration messenger (fire and forget)
+            asyncio.create_task(messenger.send_message(
+                from_agent=sender,
+                to_agent="all",
+                content=content[:500],  # Truncate long messages
+                message_type=msg_type,
+                requires_response=False
+            ))
+        except Exception as e:
+            logger.debug(f"Collaboration hook skipped: {e}")
+    
+    def enable_collaboration(self, enabled: bool = True):
+        """Enable/disable collaboration layer hooks"""
+        self._collaboration_enabled = enabled
+        logger.info(f"Collaboration layer {'enabled' if enabled else 'disabled'}")
 
     async def run(self, k=1):
         """处理一次所有信息的运行

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from metagpt.api.routes import company, config, roles, files, stream, conversation, project
+from metagpt.api.routes import company, config, roles, files, stream, conversation, project, agents
 
 app = FastAPI(
     title="MetaGPT-Pro Enterprise API",
@@ -15,6 +15,7 @@ app.include_router(files.router, prefix="/v1/files", tags=["Files"])
 app.include_router(stream.router, prefix="/v1/stream", tags=["Streaming"])
 app.include_router(conversation.router, prefix="/v1/conversation", tags=["Conversation"])
 app.include_router(project.router, prefix="/v1/project", tags=["Project"])
+app.include_router(agents.router, prefix="/v1/agents", tags=["Agent Collaboration"])
 
 @app.get("/")
 async def root():
