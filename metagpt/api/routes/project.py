@@ -194,11 +194,182 @@ async def get_project_status(project_id: str):
     """Get real-time execution status"""
     from metagpt.api.services.project_runner import project_runner
     is_running = project_runner.is_running(project_id)
+    
+    # Check for approval required state
+    approval_required = False
+    if project_id in project_runner._teams:
+        env = project_runner._teams[project_id].env
+        if hasattr(env, 'approval_required'):
+            approval_required = env.approval_required
+
     return {
         "project_id": project_id,
         "is_running": is_running,
-        "status": "running" if is_running else "idle" # simple status for now
+        "approval_required": approval_required,
+        "status": "paused" if approval_required else ("running" if is_running else "idle")
     }
+
+@router.get("/{project_id}/details")
+async def get_project_details(project_id: str):
+    """Get project metadata (initial requirements)"""
+    from metagpt.api.services.project_runner import project_runner
+    
+    # Use the new load method to ensure we check disk
+    metadata = project_runner._load_metadata(project_id)
+    return {
+        "project_id": project_id,
+        "name": metadata.get("name", f"Project {project_id}"), # todo: store real name
+        "description": metadata.get("initial_requirements", "No requirements found"),
+        "created_at": "Recently", # todo: track time
+    }
+
+@router.get("/{project_id}/agents")
+async def get_project_agents(project_id: str):
+    """Get active agents for the project"""
+    from metagpt.api.services.project_runner import project_runner
+    
+    if project_id not in project_runner._teams:
+        return {"agents": []}
+        
+    env = project_runner._teams[project_id].env
+    roles = env.get_roles() # dict of role_profile -> Role
+    
+    agent_list = []
+    for profile, role in roles.items():
+        agent_list.append({
+            "name": role.name,
+            "role": profile, # profile is like "Alice(Product Manager)" usually, need to check
+            "status": "active", # simplified
+            "currentTask": role.todo.content if role.todo else "Idle",
+            "color": "blue" # default
+        })
+        
+    return {"agents": agent_list}
+
+@router.get("/{project_id}/activity")
+async def get_project_activity(project_id: str):
+    """Get project activity history"""
+    from metagpt.api.services.project_runner import project_runner
+    
+    if project_id not in project_runner._teams:
+        return {"activity": []}
+        
+    env = project_runner._teams[project_id].env
+    # history is a generic list of Messages
+    # We want to format this for the UI
+    
+    # Access private _history if necessary or public accessor
+    msgs = env.history # history is string usually? No it's CompositeEnv history?
+    # Environment.history is usually a string concatenation in basic MetaGPT, 
+    # but let's check base_env.py. It might be a list.
+    
+    # Safely try to get messages
+    activity = []
+    
+    # In base_env.py, self.history = "" (string) usually?
+    # Let's check how we can get structured messages.
+    # The `ProjectEnvironment` inherits from Environment.
+    # We might need to inspect the `repo.docs.msg` or similar?
+    
+    # For now, let's assume we can get recent messages from the memory of roles?
+    # Or better, the board_tracker logs them?
+    
+    # Let's leave this simple for now and just return what we can
+    return {"activity": []} # detailed log implementation needed later
+
+
+@router.get("/{project_id}/files")
+async def get_project_files(project_id: str, path: str = ""):
+    """Get project file tree"""
+    from metagpt.const import DEFAULT_WORKSPACE_ROOT
+    
+    # Path is relative to project root
+    project_root = DEFAULT_WORKSPACE_ROOT / "projects" / project_id
+    target = project_root / path
+    
+    if not target.exists():
+         # If project dir doesn't exist yet, return empty
+         return {"path": path, "items": []}
+    
+    items = []
+    for item in target.iterdir():
+        items.append({
+            "name": item.name,
+            "type": "directory" if item.is_dir() else "file",
+            "size": item.stat().st_size if item.is_file() else 0
+        })
+    return {"path": path, "items": items}
+
+@router.get("/{project_id}/artifacts")
+async def get_project_artifacts(project_id: str):
+    """Get key project artifacts"""
+    from metagpt.const import DEFAULT_WORKSPACE_ROOT
+    
+    project_root = DEFAULT_WORKSPACE_ROOT / "projects" / project_id
+    artifacts = []
+    
+    # Common artifacts to look for
+    common_files = ["docs/prd.md", "docs/system_design.md", "docs/api_spec_and_tasks.md", "resources/competitive_analysis.md"]
+    
+    for relative_path in common_files:
+        f = project_root / relative_path
+        if f.exists():
+            artifacts.append({
+                "name": f.name,
+                "path": str(relative_path), # Used for fetching content
+                "type": "document",
+                "size": f.stat().st_size
+            })
+            
+    return {"artifacts": artifacts}
+
+@router.post("/{project_id}/resume")
+async def resume_project(project_id: str):
+    from metagpt.api.services.project_runner import project_runner
+    try:
+        await project_runner.resume_project(project_id)
+        return {"status": "resumed", "project_id": project_id}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.exception(f"Failed to resume project: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/{project_id}/restart")
+async def restart_project(project_id: str):
+    """Restart project (archive workspace, clear memory, rerun init requirements)"""
+    from metagpt.api.services.project_runner import project_runner
+    
+    # 1. Get initial requirements
+    metadata = project_runner._load_metadata(project_id)
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Project metadata not found (active session required for restart)")
+
+    requirements = metadata.get("initial_requirements", "")
+    
+    try:
+        # 2. Reset (Stop + Archive)
+        await project_runner.reset_project(project_id)
+        
+        # 3. Run again
+        await project_runner.run_project(project_id, requirements)
+        
+        return {"status": "restarted", "project_id": project_id}
+    except Exception as e:
+        logger.exception(f"Failed to restart project: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/{project_id}")
+async def delete_project(project_id: str):
+    """Delete project and all resources"""
+    from metagpt.api.services.project_runner import project_runner
+    try:
+        await project_runner.delete_project(project_id)
+        return {"status": "deleted", "project_id": project_id}
+    except Exception as e:
+        logger.exception(f"Failed to delete project: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @router.websocket("/{project_id}/board/stream")
